@@ -1,0 +1,115 @@
+﻿@model BWC.Models.User
+
+@{
+    ViewData["Title"] = "Add Student";
+}
+
+<style>
+    /* Main Content Styling */
+    .main-content {
+        padding: 20px;
+        max-width: 800px;
+        margin: auto;
+    }
+
+    /* Form Styling */
+    .form-container {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 20px;
+        background-color: #fff;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+            .form-group input[type="submit"] {
+                background-color: #007bff;
+                color: #fff;
+                border: none;
+                cursor: pointer;
+            }
+
+                .form-group input[type="submit"]:hover {
+                    background-color: #0056b3;
+                }
+
+        .form-group .back-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+            .form-group .back-link:hover {
+                text-decoration: underline;
+            }
+</style>
+
+<body>
+    <nav class="sidebar">
+        <!-- Sidebar content here (same as in Index.cshtml) -->
+    </nav>
+    <section class="dashboard">
+        <div class="main-content">
+            <div class="form-container">
+                <h2>Add Student</h2>
+                <form asp-action="Create">
+                    <div class="form-group">
+                        <label asp-for="FirstName"></label>
+                        <input asp-for="FirstName" />
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="MiddleName"></label>
+                        <input asp-for="MiddleName" />
+                        <span asp-validation-for="MiddleName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="LastName"></label>
+                        <input asp-for="LastName" />
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Email"></label>
+                        <input asp-for="Email" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Username"></label>
+                        <input asp-for="Username" />
+                        <span asp-validation-for="Username" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="PasswordHash"></label>
+                        <input asp-for="PasswordHash" type="password" />
+                        <span asp-validation-for="PasswordHash" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Program"></label>
+                        <input asp-for="Program" />
+                        <span asp-validation-for="Program" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Add Student" />
+                        <a class="back-link" href="@Url.Action("Index")">Back to List</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</body>

@@ -1,9 +1,11 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<BWC.Models.User>
+
+@{
+    ViewData["Title"] = "Student Functionalities";
 }
 
 <style>
-    
+    /* Sidebar Styling */
     .sidebar {
         position: fixed;
         top: 0;
@@ -22,7 +24,24 @@
     .dataTables_wrapper {
         margin-top: 20px; /* Provide some spacing from other content */
     }
+
+    /* Action Buttons Styling */
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+        .action-buttons a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+            .action-buttons a:hover {
+                color: #0056b3;
+            }
 </style>
+
 <body>
     <nav class="sidebar">
         <div class="logo-name">
@@ -34,7 +53,7 @@
         <div class="menu-items">
             <ul class="nav-links">
                 <li>
-                     <a asp-action="Index" asp-controller="Home">
+                    <a asp-action="Index" asp-controller="Home">
                         <i class="uil uil-estate"></i>
                         <span class="link-name">Dashboard</span>
                     </a>
@@ -57,19 +76,6 @@
                         <span class="link-name">Students</span>
                     </a>
                 </li>
-
-           @*      <li>
-                    <a href="#">
-                        <i class="uil uil-comments"></i>
-                        <span class="link-name">Comment</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="uil uil-share"></i>
-                        <span class="link-name">Share</span>
-                    </a>
-                </li> *@
             </ul>
 
             <ul class="logout-mode">
@@ -98,44 +104,47 @@
                 <i class="uil uil-search"></i>
                 <input type="text" placeholder="Search here...">
             </div>
-
-            <!--<img src="images/profile.jpg" alt="">-->
         </div>
-       <div class="main-content">
+        <div class="main-content">
             <div class="dash-content">
-                <div class="overview">
-                    <div class="title">
-                        <i class="uil uil-tachometer-fast-alt"></i>
-                        <span class="text">Dashboard</span>
-                    </div>
-                    <div class="boxes">
-                        <div class="box box1">
-                            <i class="uil uil-thumbs-up"></i>
-                            <span class="text">Total Appointments</span>
-                            <span class="number">50,120</span>
-                        </div>
-                        <div class="box box2">
-                            <i class="uil uil-comments"></i>
-                            <span class="text">Need Follow Up</span>
-                            <span class="number">20,120</span>
-                        </div>
-                        <div class="box box3">
-                            <i class="uil uil-share"></i>
-                            <span class="text">Completed Counseling</span>
-                            <span class="number">10,120</span>
-                        </div>
-                    </div>
-                </div>
-               
-                        
-                    </div>
-                </div>
-         
-       
+                <a href="@Url.Action("Create")" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background-color: #007bff; text-decoration: none; border-radius: 5px; margin-bottom: 20px;">Add Student</a>
+
+                <table id="activitytable" class="display">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Joined</th>
+                            <th>Program</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var student in Model)
+                        {
+                            <tr>
+                                <td>@student.FirstName @student.LastName</td>
+                                <td>@student.Email</td>
+                                <td>@student.CreatedAt.ToString("yyyy-MM-dd")</td>
+                                <td>@student.Program</td>
+                                <td class="action-buttons">
+                                    <a href="@Url.Action("Edit", new { id = student.Id })"><i class="uil uil-edit"></i></a>
+                                    <a href="@Url.Action("Delete", new { id = student.Id })"><i class="uil uil-trash"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </section>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <script>
-        $(document).ready(function() {
-            $('#activityTable').DataTable();
+        $(document).ready(function () {
+            $('#activitytable').DataTable();
         });
     </script>
 </body>
