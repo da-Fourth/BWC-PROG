@@ -1,0 +1,221 @@
+﻿@model BWC.Models.User
+
+@{
+    ViewData["Title"] = "Register";
+    Layout = null;
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+        background: #1abc9c;
+        overflow: hidden;
+    }
+
+    ::selection {
+        background: rgba(26, 188, 156, 0.3);
+    }
+
+    .container {
+        max-width: 440px;
+        padding: 0 20px;
+        margin: 170px auto;
+    }
+
+    .wrapper {
+        width: 100%;
+        background: #fff;
+        border-radius: 5px;
+        box-shadow: 0px 4px 10px 1px rgba(0, 0, 0, 0.1);
+    }
+
+        .wrapper .title {
+            height: 90px;
+            background: #16a085;
+            border-radius: 5px 5px 0 0;
+            color: #fff;
+            font-size: 30px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wrapper form {
+            padding: 30px 25px 25px 25px;
+        }
+
+            .wrapper form .row {
+                height: 45px;
+                margin-bottom: 15px;
+                position: relative;
+            }
+
+                .wrapper form .row input {
+                    height: 100%;
+                    width: 100%;
+                    outline: none;
+                    padding-left: 60px;
+                    border-radius: 5px;
+                    border: 1px solid lightgrey;
+                    font-size: 16px;
+                    transition: all 0.3s ease;
+                }
+
+    form .row input:focus {
+        border-color: #16a085;
+        box-shadow: inset 0px 0px 2px 2px rgba(26, 188, 156, 0.25);
+    }
+
+    form .row input::placeholder {
+        color: #999;
+    }
+
+    .wrapper form .row i {
+        position: absolute;
+        width: 47px;
+        height: 100%;
+        color: #fff;
+        font-size: 18px;
+        background: #16a085;
+        border: 1px solid #16a085;
+        border-radius: 5px 0 0 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .wrapper form .pass {
+        margin: -8px 0 20px 0;
+    }
+
+        .wrapper form .pass a {
+            color: #16a085;
+            font-size: 17px;
+            text-decoration: none;
+        }
+
+            .wrapper form .pass a:hover {
+                text-decoration: underline;
+            }
+
+    .wrapper form .button input {
+        color: #fff;
+        font-size: 20px;
+        font-weight: 500;
+        padding-left: 0px;
+        background: #16a085;
+        border: 1px solid #16a085;
+        cursor: pointer;
+    }
+
+    form .button input:hover {
+        background: #12876f;
+    }
+
+    .wrapper form .signup-link {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 17px;
+    }
+
+        .wrapper form .signup-link a {
+            color: #16a085;
+            text-decoration: none;
+        }
+
+    form .signup-link a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+
+<div class="container">
+    <div class="wrapper" style="width: 100%">
+        <div class="title"><span>Register Form</span></div>
+        <form asp-action="Register" method="post">
+            <div class="row">
+                <div class="col-md-6">
+                    <i class="fas fa-user"></i>
+                    <input asp-for="FirstName" placeholder="First Name" class="form-control single-input" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <i class="fas fa-user"></i>
+                    <input asp-for="MiddleName" placeholder="Middle Name" class="form-control single-input" />
+                    <span asp-validation-for="MiddleName" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <i class="fas fa-user"></i>
+                    <input asp-for="LastName" placeholder="Last Name" class="form-control single-input" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <i class="fas fa-envelope"></i>
+                    <input asp-for="Email" placeholder="Email" class="form-control single-input" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <i class="fas fa-user"></i>
+                    <input asp-for="Username" placeholder="Username" class="form-control single-input" />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <i class="fas fa-lock"></i>
+                    <input asp-for="PasswordHash" type="password" placeholder="Password" class="form-control single-input" />
+                    <span asp-validation-for="PasswordHash" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <i class="fas fa-user-tag"></i>
+                    <select asp-for="Role" class="form-control single-input">
+                        <option value="" selected disabled>Select Role</option>
+                        <option value="0">Student</option>
+                        <option value="1">Counselor</option>
+                    </select>
+                    <span asp-validation-for="Role" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <i class="fas fa-graduation-cap"></i>
+                    <select asp-for="Program" class="form-control single-input">
+                        <option value="" selected disabled>Select Program</option>
+                        <option value="1">Bachelor of Science in Information Systems</option>
+                        <option value="2">Bachelor of Science in Computer Science</option>
+                        <option value="3">Bachelor of Science in Information Technology</option>
+                        <option value="4">Bachelor of Arts in Multimedia Arts</option>
+                        <option value="5">Bachelor of Science in Hospitality Management</option>
+                        <option value="6">Bachelor of Science in Tourism Management</option>
+                        <option value="7">Bachelor of Science in Business Administration</option>
+                        <option value="8">Bachelor of Science in Psychology</option>
+                        <option value="9">Bachelor of Arts in Communication</option>
+                        <option value="10">Bachelor of Science in Accountancy</option>
+                    </select>
+                    <span asp-validation-for="Program" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="button">
+                        <input type="submit" value="Register" class="btn btn-primary">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
