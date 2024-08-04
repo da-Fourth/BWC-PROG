@@ -1,5 +1,151 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IEnumerable<BWC.Models.User>
+
 @{
+    ViewData["Title"] = "Counselor Functionalities";
 }
+
+<style>
+    /* Sidebar Styling */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background-color: #f8f9fa;
+        z-index: 1000; /* Ensure it is above other content */
+    }
+
+    /* Main Content Styling */
+    .main-content {
+        padding: 20px;
+    }
+
+    /* DataTable Adjustment */
+    .dataTables_wrapper {
+        margin-top: 20px; /* Provide some spacing from other content */
+    }
+
+    /* Action Buttons Styling */
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+        .action-buttons a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+            .action-buttons a:hover {
+                color: #0056b3;
+            }
+</style>
+
+<body>
+    <nav class="sidebar">
+        <div class="logo-name">
+            <div class="logo-image">
+                <img src="logo.jpg" alt="">
+            </div>
+            <span class="logo_name">St. Benilde Well Being Center</span>
+        </div>
+        <div class="menu-items">
+            <ul class="nav-links">
+                <li>
+                    <a asp-action="Index" asp-controller="Home">
+                        <i class="uil uil-estate"></i>
+                        <span class="link-name">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-action="Index" asp-controller="AppointmentAdmin">
+                        <i class="uil uil-calendar-alt"></i>
+                        <span class="link-name">Appointments</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-action="Index" asp-controller="CounselorAdmin">
+                        <i class="uil uil-users-alt"></i>
+                        <span class="link-name">Counselors</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-action="Index" asp-controller="StudentAdmin">
+                        <i class="uil uil-graduation-cap"></i>
+                        <span class="link-name">Students</span>
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="logout-mode">
+                <li>
+                    <a asp-action="Index" asp-controller="Login">
+                        <i class="uil uil-signout"></i>
+                        <span class="link-name">Logout</span>
+                    </a>
+                </li>
+                <li class="mode">
+                    <a href="#">
+                        <i class="uil uil-moon"></i>
+                        <span class="link-name">Dark Mode</span>
+                    </a>
+                    <div class="mode-toggle">
+                        <span class="switch"></span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <section class="dashboard">
+        <div class="top">
+            <i class="uil uil-bars sidebar-toggle"></i>
+            <div class="search-box">
+                <i class="uil uil-search"></i>
+                <input type="text" placeholder="Search here...">
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="dash-content">
+                <a href="@Url.Action("Create")" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background-color: #007bff; text-decoration: none; border-radius: 5px; margin-bottom: 20px;">Add Counselor</a>
+
+                <table id="activitytable" class="display">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Joined</th>
+                            <th>Program</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var counselor in Model)
+                        {
+                            <tr>
+                                <td>@counselor.FirstName @counselor.LastName</td>
+                                <td>@counselor.Email</td>
+                                <td>@counselor.CreatedAt.ToString("yyyy-MM-dd")</td>
+                                <td>@counselor.Program</td>
+                                <td class="action-buttons">
+                                    <a href="@Url.Action("Edit", new { id = counselor.Id })"><i class="uil uil-edit"></i></a>
+                                    <a href="@Url.Action("Delete", new { id = counselor.Id })"><i class="uil uil-trash"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </section>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script>
+        $(document).ready(function () {
+            $('#activitytable').DataTable();
+        });
+    </script>
+</body>

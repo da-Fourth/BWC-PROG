@@ -1,0 +1,71 @@
+﻿@model BWC.Models.User
+
+@{
+    ViewData["Title"] = "Delete Counselor";
+}
+
+<style>
+    /* Delete Confirmation Styling */
+    .delete-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #f9f9f9;
+    }
+
+        .delete-container h2 {
+            margin-bottom: 20px;
+        }
+
+        .delete-container form {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .delete-container button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+            background-color: #dc3545;
+        }
+
+    .cancel-button {
+        background-color: #6c757d;
+    }
+</style>
+
+<body>
+    <nav class="sidebar">
+        <div class="logo-name">
+            <div class="logo-image">
+                <img src="logo.jpg" alt="">
+            </div>
+            <span class="logo_name">St. Benilde Well Being Center</span>
+        </div>
+        <div class="menu-items">
+            <!-- Add your menu items here -->
+        </div>
+    </nav>
+    <section class="dashboard">
+        <div class="top">
+            <i class="uil uil-bars sidebar-toggle"></i>
+        </div>
+        <div class="main-content">
+            <div class="delete-container">
+                <h2>Delete Counselor</h2>
+                <p>Are you sure you want to delete <strong>@Model.FirstName @Model.LastName</strong>?</p>
+                <form asp-action="DeleteConfirmed" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Id" value="@Model.Id" />
+                    <button type="submit">Delete</button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary cancel-button">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </section>
+</body>

@@ -17,11 +17,20 @@ namespace BWC.Controllers
         // GET: /StudentAdmin
         public async Task<IActionResult> Index()
         {
-            var students = await _context.Users
-                .Where(u => u.Role == 0) // Fetch users with role = 0 (Student)
-                .ToListAsync();
+            try
+            {
+                var students = await _context.Users
+                    .Where(u => u.Role == 0) // Fetch users with role = 0 (Student)
+                    .ToListAsync();
 
-            return View(students);
+                return View(students);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                // _logger.LogError(ex, "An error occurred while fetching the students.");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         // GET: /StudentAdmin/Create
@@ -35,25 +44,45 @@ namespace BWC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("FirstName,MiddleName,LastName,Email,Username,PasswordHash,Program")] User user)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+            {
+                return View(user);
+            }
+
+            try
             {
                 user.Role = 0; // Set role to 0 for Student
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(user);
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                // _logger.LogError(ex, "An error occurred while creating the student.");
+                ModelState.AddModelError(string.Empty, "An error occurred while creating the student.");
+                return View(user);
+            }
         }
 
         // GET: /StudentAdmin/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null || user.Role != 0) // Ensure user exists and has role = 0
+            try
             {
-                return NotFound();
+                var user = await _context.Users.FindAsync(id);
+                if (user == null || user.Role != 0) // Ensure user exists and has role = 0
+                {
+                    return NotFound();
+                }
+                return View(user);
             }
-            return View(user);
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                // _logger.LogError(ex, "An error occurred while fetching the student for editing.");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         // POST: /StudentAdmin/Edit/5
@@ -66,39 +95,58 @@ namespace BWC.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(user);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UserExists(user.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                return View(user);
+            }
+
+            try
+            {
+                _context.Update(user);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(user);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserExists(user.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    // Log the exception (optional)
+                    // _logger.LogError(ex, "A concurrency error occurred while updating the student.");
+                    throw;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                // _logger.LogError(ex, "An error occurred while updating the student.");
+                ModelState.AddModelError(string.Empty, "An error occurred while updating the student.");
+                return View(user);
+            }
         }
 
         // GET: /StudentAdmin/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Id == id && u.Role == 0);
-            if (user == null)
+            try
             {
-                return NotFound();
+                var user = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Id == id && u.Role == 0);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                return View(user);
             }
-            return View(user);
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                // _logger.LogError(ex, "An error occurred while fetching the student for deletion.");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         // POST: /StudentAdmin/Delete/5
@@ -106,18 +154,36 @@ namespace BWC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user != null && user.Role == 0)
+            try
             {
-                _context.Users.Remove(user);
-                await _context.SaveChangesAsync();
+                var user = await _context.Users.FindAsync(id);
+                if (user != null && user.Role == 0)
+                {
+                    _context.Users.Remove(user);
+                    await _context.SaveChangesAsync();
+                }
+                return RedirectToAction(nameof(Index));
             }
-            return RedirectToAction(nameof(Index));
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                // _logger.LogError(ex, "An error occurred while deleting the student.");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         private bool UserExists(int id)
         {
-            return _context.Users.Any(e => e.Id == id && e.Role == 0);
+            try
+            {
+                return _context.Users.Any(e => e.Id == id && e.Role == 0);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                // _logger.LogError(ex, "An error occurred while checking if the user exists.");
+                return false;
+            }
         }
     }
 }

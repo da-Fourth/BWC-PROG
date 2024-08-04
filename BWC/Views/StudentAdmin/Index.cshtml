@@ -80,7 +80,7 @@
 
             <ul class="logout-mode">
                 <li>
-                    <a href="#">
+                    <a asp-action="Index" asp-controller="Login">
                         <i class="uil uil-signout"></i>
                         <span class="link-name">Logout</span>
                     </a>
@@ -120,21 +120,22 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var student in Model)
+                        @foreach (var counselor in Model)
                         {
                             <tr>
-                                <td>@student.FirstName @student.LastName</td>
-                                <td>@student.Email</td>
-                                <td>@student.CreatedAt.ToString("yyyy-MM-dd")</td>
-                                <td>@student.Program</td>
+                                <td>@counselor.FirstName @counselor.LastName</td>
+                                <td>@counselor.Email</td>
+                                <td>@counselor.CreatedAt.ToString("yyyy-MM-dd")</td>
+                                <td>@counselor.Program</td>
                                 <td class="action-buttons">
-                                    <a href="@Url.Action("Edit", new { id = student.Id })"><i class="uil uil-edit"></i></a>
-                                    <a href="@Url.Action("Delete", new { id = student.Id })"><i class="uil uil-trash"></i></a>
+                                    <a href="@Url.Action("Edit", new { id = counselor.Id })"><i class="uil uil-edit"></i></a>
+                                    <a href="@Url.Action("Delete", new { id = counselor.Id })"><i class="uil uil-trash"></i></a>
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
+
             </div>
         </div>
     </section>

@@ -68,46 +68,47 @@
         <div class="main-content">
             <div class="form-container">
                 <h2>Edit Student</h2>
-                <form asp-action="Edit">
-                    <input type="hidden" asp-for="Id" />
+                <form asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Id" value="@Model.Id" />
+
                     <div class="form-group">
-                        <label asp-for="FirstName"></label>
-                        <input asp-for="FirstName" />
-                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                        <label for="FirstName">First Name</label>
+                        <input type="text" id="FirstName" name="FirstName" value="@Model.FirstName" required />
                     </div>
+
                     <div class="form-group">
-                        <label asp-for="MiddleName"></label>
-                        <input asp-for="MiddleName" />
-                        <span asp-validation-for="MiddleName" class="text-danger"></span>
+                        <label for="MiddleName">Middle Name</label>
+                        <input type="text" id="MiddleName" name="MiddleName" value="@Model.MiddleName" />
                     </div>
+
                     <div class="form-group">
-                        <label asp-for="LastName"></label>
-                        <input asp-for="LastName" />
-                        <span asp-validation-for="LastName" class="text-danger"></span>
+                        <label for="LastName">Last Name</label>
+                        <input type="text" id="LastName" name="LastName" value="@Model.LastName" required />
                     </div>
+
                     <div class="form-group">
-                        <label asp-for="Email"></label>
-                        <input asp-for="Email" />
-                        <span asp-validation-for="Email" class="text-danger"></span>
+                        <label for="Email">Email</label>
+                        <input type="email" id="Email" name="Email" value="@Model.Email" required />
                     </div>
+
                     <div class="form-group">
-                        <label asp-for="Username"></label>
-                        <input asp-for="Username" />
-                        <span asp-validation-for="Username" class="text-danger"></span>
+                        <label for="Username">Username</label>
+                        <input type="text" id="Username" name="Username" value="@Model.Username" required />
                     </div>
+
                     <div class="form-group">
-                        <label asp-for="PasswordHash"></label>
-                        <input asp-for="PasswordHash" type="password" />
-                        <span asp-validation-for="PasswordHash" class="text-danger"></span>
+                        <label for="PasswordHash">Password</label>
+                        <input type="password" id="PasswordHash" name="PasswordHash" value="@Model.PasswordHash" required />
                     </div>
+
                     <div class="form-group">
-                        <label asp-for="Program"></label>
-                        <input asp-for="Program" />
-                        <span asp-validation-for="Program" class="text-danger"></span>
+                        <label for="Program">Program</label>
+                        <input type="text" id="Program" name="Program" value="@Model.Program" />
                     </div>
+
                     <div class="form-group">
-                        <input type="submit" value="Save Changes" />
-                        <a class="back-link" href="@Url.Action("Index")">Back to List</a>
+                        <button type="submit">Save Changes</button>
                     </div>
                 </form>
             </div>
