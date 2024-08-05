@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<BWC.Models.Appointment>
 
 @{
-    ViewData["Title"] = "Counselor Functionalities";
+    ViewData["Title"] = "My Appointments";
 }
 
 <style>
@@ -46,36 +46,18 @@
     <nav class="sidebar">
         <div class="logo-name">
             <div class="logo-image">
-                <img src="logo.jpg" alt="">
+                <img src="logo.jpg" alt="Logo">
             </div>
             <span class="logo_name">Benilde Well Being Center</span>
         </div>
         <div class="menu-items">
             <ul class="nav-links">
                 <li>
-                    <a asp-action="Index" asp-controller="Home">
+                    <a asp-action="Index" asp-controller="StudentAppointment">
                         <i class="uil uil-estate"></i>
                         <span class="link-name">Dashboard</span>
                     </a>
-                </li>
-                <li>
-                    <a asp-action="Index" asp-controller="AdminAppointment">
-                        <i class="uil uil-calendar-alt"></i>
-                        <span class="link-name">Appointments</span>
-                    </a>
-                </li>
-                <li>
-                    <a asp-action="Index" asp-controller="CounselorAdmin">
-                        <i class="uil uil-users-alt"></i>
-                        <span class="link-name">Counselors</span>
-                    </a>
-                </li>
-                <li>
-                    <a asp-action="Index" asp-controller="StudentAdmin">
-                        <i class="uil uil-graduation-cap"></i>
-                        <span class="link-name">Students</span>
-                    </a>
-                </li>
+                </li>            
             </ul>
 
             <ul class="logout-mode">
@@ -85,7 +67,6 @@
                         <span class="link-name">Logout</span>
                     </a>
                 </li>
-                
             </ul>
         </div>
     </nav>
@@ -111,30 +92,15 @@
 
                 @if (Model.Any())
                 {
-                    <div>
-                        <a asp-action="Create" class="btn btn-primary">Create New Appointment</a>
-                    </div>
-
-                    <h2>Delete Appointment</h2>
-                    <form asp-action="Delete" asp-controller="AdminAppointment" method="post" onsubmit="return validateDeleteForm()">
-                        <select name="Id" id="appointmentId" class="form-control">
-                            <option value="">-- Select Appointment to Delete --</option>
-                            @foreach (var appointment in Model)
-                            {
-                                <option value="@appointment.Appointment_Id">@appointment.Student.FirstName @appointment.Student.LastName</option>
-                            }
-                        </select>
-                        <input type="submit" value="Delete" class="btn btn-danger" />
-                    </form>
-
-                    <br />
-
                     <h2>Appointments</h2>
                     @foreach (var appointment in Model)
                     {
-                        <div>
-                            <strong>@appointment.Student.FirstName @appointment.Student.LastName</strong> - @appointment.AppointmentDate.ToString("MMMM dd, yyyy")
-                        </div>
+                        if (appointment != null && appointment.Counselor != null)
+                        {
+                            <div>
+                                <strong>@appointment.Counselor.FirstName @appointment.Counselor.LastName</strong> - @appointment.AppointmentDate.ToString("MMMM dd, yyyy")
+                            </div>
+                        }
                     }
                 }
                 else
@@ -142,16 +108,8 @@
                     <p>No appointments available.</p>
                 }
 
-                <script>
-                    function validateDeleteForm() {
-                        var appointmentId = document.getElementById("appointmentId").value;
-                        if (appointmentId === "") {
-                            alert("Please select an appointment to delete.");
-                            return false;
-                        }
-                        return true;
-                    }
 
+                <script>
                     document.addEventListener('DOMContentLoaded', function () {
                         var calendarEl = document.getElementById('calendar');
                         var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -164,17 +122,19 @@
                             events: [
                     @foreach (var appointment in Model)
                     {
-                        var studentName = appointment.Student.FirstName + " " + appointment.Student.LastName;
-                        <text>
-                                    {
-                                        title: '@(appointment.Student.Role == 0 ? studentName : appointment.Reason)',
-                                        start: '@appointment.AppointmentDate.ToString("yyyy-MM-ddTHH:mm:ss")',
-                                        end: '@appointment.AppointmentDate.AddHours(1).ToString("yyyy-MM-ddTHH:mm:ss")', // Assuming 1 hour duration
-                                        description: '@appointment.AppointmentType',
-                                        url: '@Url.Action("Edit", "AdminAppointment", new { id = appointment.Appointment_Id })'
-                                    }, </text>
+                        if (appointment != null && appointment.Student != null)
+                        {
+                            <text>
+                                        {
+                                            title: '@appointment.Reason',
+                                            start: '@appointment.AppointmentDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                                            end: '@appointment.AppointmentDate.AddHours(1).ToString("yyyy-MM-ddTHH:mm:ss")', // Assuming 1 hour duration
+                                            description: '@appointment.AppointmentType',
+                                            url: '@Url.Action("Edit", "StudentAppointment", new { id = appointment.Appointment_Id })'
+                                        }, </text>
+                        }
                     }
-                                                    ],
+                                                ],
                             eventClick: function (info) {
                                 info.jsEvent.preventDefault(); // Prevent the browser from following the link immediately
                                 window.location.href = info.event.url; // Redirect to the Edit page

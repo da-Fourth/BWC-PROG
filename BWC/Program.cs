@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using BWC.DataConnection;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using BWC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LoginPath = "/Login/Index"; // Redirect to login page
     });
 
+
+// Register the user service
+builder.Services.AddSingleton<IUserService, UserService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

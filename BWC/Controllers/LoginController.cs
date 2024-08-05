@@ -2,19 +2,21 @@
 using BWC.DataConnection;
 using Microsoft.EntityFrameworkCore;
 using BWC.Models;
+using System.Threading.Tasks;
+using BWC.Services;
 
 namespace BWC.Controllers
 {
     public class LoginController : Controller
     {
-
         private readonly SqlServerDbContext _context;
+        private readonly IUserService _userService;
 
-        public LoginController(SqlServerDbContext context)
+        public LoginController(SqlServerDbContext context, IUserService userService)
         {
             _context = context;
+            _userService = userService;
         }
-
 
         public IActionResult Index()
         {
@@ -35,6 +37,10 @@ namespace BWC.Controllers
 
                         if (user != null)
                         {
+                            // Save user information in the user service
+                            _userService.UserId = user.Id.ToString();
+                            _userService.Username = user.Username;
+
                             // Login successful, redirect to a secure page
                             return RedirectToAction("Index", "Home");
                         }
@@ -56,13 +62,11 @@ namespace BWC.Controllers
             }
             catch (Exception ex)
             {
-        
                 ModelState.AddModelError(string.Empty, "An error occurred. Please try again.");
             }
 
             // If we got this far, something failed, redisplay form
             return View("Index", model);
         }
-
     }
 }
