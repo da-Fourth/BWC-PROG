@@ -1,0 +1,201 @@
+﻿@model IEnumerable<BWC.Models.Appointment>
+
+@{
+    ViewData["Title"] = "Counselor Functionalities";
+}
+
+<style>
+    /* Sidebar Styling */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background-color: #f8f9fa;
+        z-index: 1000; /* Ensure it is above other content */
+    }
+
+    /* Main Content Styling */
+    .main-content {
+        padding: 20px;
+    }
+
+    /* DataTable Adjustment */
+    .dataTables_wrapper {
+        margin-top: 20px; /* Provide some spacing from other content */
+    }
+
+    /* Action Buttons Styling */
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+        .action-buttons a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+            .action-buttons a:hover {
+                color: #0056b3;
+            }
+</style>
+
+<body>
+    <nav class="sidebar">
+        <div class="logo-name">
+            <div class="logo-image">
+                <img src="logo.jpg" alt="">
+            </div>
+            <span class="logo_name">Benilde Well Being Center</span>
+        </div>
+        <div class="menu-items">
+            <ul class="nav-links">
+                <li>
+                    <a asp-action="Index" asp-controller="Home">
+                        <i class="uil uil-estate"></i>
+                        <span class="link-name">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-action="Index" asp-controller="AdminAppointment">
+                        <i class="uil uil-calendar-alt"></i>
+                        <span class="link-name">Appointments</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-action="Index" asp-controller="CounselorAdmin">
+                        <i class="uil uil-users-alt"></i>
+                        <span class="link-name">Counselors</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-action="Index" asp-controller="StudentAdmin">
+                        <i class="uil uil-graduation-cap"></i>
+                        <span class="link-name">Students</span>
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="logout-mode">
+                <li>
+                    <a asp-action="Index" asp-controller="Login">
+                        <i class="uil uil-signout"></i>
+                        <span class="link-name">Logout</span>
+                    </a>
+                </li>
+                <li class="mode">
+                    <a href="#">
+                        <i class="uil uil-moon"></i>
+                        <span class="link-name">Dark Mode</span>
+                    </a>
+                    <div class="mode-toggle">
+                        <span class="switch"></span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <section class="dashboard">
+        <div class="top">
+            <i class="uil uil-bars sidebar-toggle"></i>
+            <div class="search-box">
+                <i class="uil uil-search"></i>
+                <input type="text" placeholder="Search here...">
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="dash-content">
+                <a href="@Url.Action("Create")" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background-color: #007bff; text-decoration: none; border-radius: 5px; margin-bottom: 20px;">Add Appointment</a>
+
+                <!-- FullCalendar CSS -->
+                <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.1/main.min.css' rel='stylesheet' />
+
+                <!-- FullCalendar JS -->
+                <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+
+                <div id="calendar"></div>
+
+                @if (Model.Any())
+                {
+                    <div>
+                        <a asp-action="Create" class="btn btn-primary">Create New Appointment</a>
+                    </div>
+
+                    <h2>Delete Appointment</h2>
+                    <form asp-action="Delete" asp-controller="AdminAppointment" method="post" onsubmit="return validateDeleteForm()">
+                        <select name="Id" id="appointmentId" class="form-control">
+                            <option value="">-- Select Appointment to Delete --</option>
+                            @foreach (var appointment in Model)
+                            {
+                                <option value="@appointment.Appointment_Id">@appointment.Student.FirstName @appointment.Student.LastName</option>
+                            }
+                        </select>
+                        <input type="submit" value="Delete" class="btn btn-danger" />
+                    </form>
+
+                    <br />
+
+                    <h2>Appointments</h2>
+                    @foreach (var appointment in Model)
+                    {
+                        <div>
+                            <strong>@appointment.Student.FirstName @appointment.Student.LastName</strong> - @appointment.AppointmentDate.ToString("MMMM dd, yyyy")
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>No appointments available.</p>
+                }
+
+                <script>
+                    function validateDeleteForm() {
+                        var appointmentId = document.getElementById("appointmentId").value;
+                        if (appointmentId === "") {
+                            alert("Please select an appointment to delete.");
+                            return false;
+                        }
+                        return true;
+                    }
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var calendarEl = document.getElementById('calendar');
+                        var calendar = new FullCalendar.Calendar(calendarEl, {
+                            initialView: 'dayGridMonth',
+                            headerToolbar: {
+                                left: 'prev,next today',
+                                center: 'title',
+                                right: 'dayGridMonth,timeGridDay'
+                            },
+                            events: [
+                    @foreach (var appointment in Model)
+                    {
+                        var studentName = appointment.Student.FirstName + " " + appointment.Student.LastName;
+                        <text>
+                                    {
+                                        title: '@(appointment.Student.Role == 0 ? studentName : appointment.Reason)',
+                                        start: '@appointment.AppointmentDate.ToString("yyyy-MM-ddTHH:mm:ss")',
+                                        end: '@appointment.AppointmentDate.AddHours(1).ToString("yyyy-MM-ddTHH:mm:ss")', // Assuming 1 hour duration
+                                        description: '@appointment.AppointmentType',
+                                        url: '@Url.Action("Edit", "AdminAppointment", new { id = appointment.Appointment_Id })'
+                                    }, </text>
+                    }
+                                                    ],
+                            eventClick: function (info) {
+                                info.jsEvent.preventDefault(); // Prevent the browser from following the link immediately
+                                window.location.href = info.event.url; // Redirect to the Edit page
+                            }
+                        });
+                        calendar.render();
+                    });
+                </script>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+</body>

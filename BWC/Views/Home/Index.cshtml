@@ -1,9 +1,10 @@
-﻿@{
+﻿@model BWC.Models.AppointmentStatisticsViewModel
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <style>
-    
     .sidebar {
         position: fixed;
         top: 0;
@@ -29,18 +30,18 @@
             <div class="logo-image">
                 <img src="logo.jpg" alt="">
             </div>
-            <span class="logo_name">St. Benilde Well Being Center</span>
+            <span class="logo_name">Benilde Well Being Center</span>
         </div>
         <div class="menu-items">
             <ul class="nav-links">
                 <li>
-                     <a asp-action="Index" asp-controller="Home">
+                    <a asp-action="Index" asp-controller="Home">
                         <i class="uil uil-estate"></i>
                         <span class="link-name">Dashboard</span>
                     </a>
                 </li>
                 <li>
-                    <a asp-action="Index" asp-controller="AppointmentAdmin">
+                    <a asp-action="Index" asp-controller="AdminAppointment">
                         <i class="uil uil-calendar-alt"></i>
                         <span class="link-name">Appointments</span>
                     </a>
@@ -57,19 +58,6 @@
                         <span class="link-name">Students</span>
                     </a>
                 </li>
-
-           @*      <li>
-                    <a href="#">
-                        <i class="uil uil-comments"></i>
-                        <span class="link-name">Comment</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="uil uil-share"></i>
-                        <span class="link-name">Share</span>
-                    </a>
-                </li> *@
             </ul>
 
             <ul class="logout-mode">
@@ -98,10 +86,8 @@
                 <i class="uil uil-search"></i>
                 <input type="text" placeholder="Search here...">
             </div>
-
-            <!--<img src="images/profile.jpg" alt="">-->
         </div>
-       <div class="main-content">
+        <div class="main-content">
             <div class="dash-content">
                 <div class="overview">
                     <div class="title">
@@ -110,32 +96,23 @@
                     </div>
                     <div class="boxes">
                         <div class="box box1">
-                            <i class="uil uil-thumbs-up"></i>
+                            <i class="uil uil-calendar-alt"></i>
                             <span class="text">Total Appointments</span>
-                            <span class="number">50,120</span>
+                            <span class="number">@Model.TotalAppointments</span>
                         </div>
                         <div class="box box2">
-                            <i class="uil uil-comments"></i>
-                            <span class="text">Need Follow Up</span>
-                            <span class="number">20,120</span>
+                            <i class="uil uil-repeat"></i>
+                            <span class="text">Follow Ups</span>
+                            <span class="number">@Model.FollowUps</span>
                         </div>
                         <div class="box box3">
-                            <i class="uil uil-share"></i>
+                            <i class="uil uil-check-circle"></i>
                             <span class="text">Completed Counseling</span>
-                            <span class="number">10,120</span>
+                            <span class="number">@Model.Completed</span>
                         </div>
                     </div>
                 </div>
-               
-                        
-                    </div>
-                </div>
-         
-       
+            </div>
+        </div>
     </section>
-    <script>
-        $(document).ready(function() {
-            $('#activityTable').DataTable();
-        });
-    </script>
 </body>

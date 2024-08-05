@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using BWC.DataConnection; // Update with the actual namespace for your DbContext
+using BWC.DataConnection;
 using BWC.Models;
 
 namespace BWC.Controllers

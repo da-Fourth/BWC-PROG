@@ -1,0 +1,28 @@
+﻿@model IEnumerable<BWC.Models.Appointment>
+
+@{
+    ViewData["Title"] = "Delete Appointment";
+}
+
+<h2>Delete Appointment</h2>
+
+@if (Model.Any())
+{
+    <form asp-action="Delete" asp-controller="AdminAppointment" method="post">
+        <div class="form-group">
+            <label for="appointmentId">Select Appointment to Delete</label>
+            <select id="appointmentId" name="Id" class="form-control">
+                <option value="">-- Select Appointment --</option>
+                @foreach (var appointment in Model)
+                {
+                    <option value="@appointment.Appointment_Id">@appointment.Reason - @appointment.AppointmentDate.ToString("yyyy-MM-dd HH:mm")</option>
+                }
+            </select>
+        </div>
+        <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+}
+else
+{
+    <p>No appointments available to delete.</p>
+}

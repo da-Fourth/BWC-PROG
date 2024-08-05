@@ -6,7 +6,7 @@ namespace BWC.Models
     public class Appointment
     {
         [Key]
-        public int AppointmentId { get; set; }
+        public int Appointment_Id { get; set; }
 
         public int? CounselorId { get; set; }
 
@@ -25,8 +25,8 @@ namespace BWC.Models
 
         public int? Status { get; set; } // Values: 1 (Pending), 2 (Approved), 3 (No-Show), 4 (Cancelled), 5 (Complete)
 
-        [StringLength(255)]
-        public string Program { get; set; }
+        //[StringLength(255)]
+        //public string Program { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
