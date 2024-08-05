@@ -42,6 +42,32 @@
             }
 </style>
 
+@functions {
+    public string GetStatusText(int? status)
+    {
+        if (!status.HasValue)
+        {
+            return "Unknown";
+        }
+
+        switch (status.Value)
+        {
+            case 0:
+                return "Pending";
+            case 1:
+                return "Approved";
+            case 2:
+                return "No Show";
+            case 3:
+                return "Cancelled";
+            case 4:
+                return "Complete";
+            default:
+                return "Unknown";
+        }
+    }
+}
+
 <body>
     <nav class="sidebar">
         <div class="logo-name">
@@ -57,7 +83,7 @@
                         <i class="uil uil-estate"></i>
                         <span class="link-name">Dashboard</span>
                     </a>
-                </li>            
+                </li>
             </ul>
 
             <ul class="logout-mode">
@@ -98,7 +124,7 @@
                         if (appointment != null && appointment.Counselor != null)
                         {
                             <div>
-                                <strong>@appointment.Counselor.FirstName @appointment.Counselor.LastName</strong> - @appointment.AppointmentDate.ToString("MMMM dd, yyyy")
+                                <strong>@appointment.Counselor.FirstName @appointment.Counselor.LastName</strong> - @appointment.AppointmentDate.ToString("MMMM dd, yyyy") - @GetStatusText(appointment.Status)
                             </div>
                         }
                     }
@@ -107,7 +133,6 @@
                 {
                     <p>No appointments available.</p>
                 }
-
 
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
@@ -134,7 +159,7 @@
                                         }, </text>
                         }
                     }
-                                                ],
+                                                                    ],
                             eventClick: function (info) {
                                 info.jsEvent.preventDefault(); // Prevent the browser from following the link immediately
                                 window.location.href = info.event.url; // Redirect to the Edit page

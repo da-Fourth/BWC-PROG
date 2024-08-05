@@ -23,6 +23,7 @@ namespace BWC.Controllers
             return View();
         }
 
+     
         [HttpPost]
         public async Task<IActionResult> Login(LoginDto model)
         {
@@ -41,8 +42,20 @@ namespace BWC.Controllers
                             _userService.UserId = user.Id.ToString();
                             _userService.Username = user.Username;
 
-                            // Login successful, redirect to a secure page
-                            return RedirectToAction("Index", "Home");
+                            // Redirect based on user role
+                            switch (user.Role)
+                            {
+                                case 0:
+                                    return RedirectToAction("Index", "StudentAppointment");
+                                case 1:
+                                    return RedirectToAction("Index", "CounselorAppointment");
+                                case 2:
+                                    return RedirectToAction("Index", "AdminAppointment");
+                                default:
+                                    // Handle other roles or default case
+                                    ModelState.AddModelError(string.Empty, "Invalid role.");
+                                    break;
+                            }
                         }
                         else
                         {
@@ -68,5 +81,6 @@ namespace BWC.Controllers
             // If we got this far, something failed, redisplay form
             return View("Index", model);
         }
+
     }
 }
