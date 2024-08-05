@@ -2,16 +2,19 @@
 using Microsoft.EntityFrameworkCore;
 using BWC.DataConnection; // Update with the actual namespace for your DbContext
 using BWC.Models;
+using Microsoft.Extensions.Logging; // Add using directive for logging
 
 namespace BWC.Controllers
 {
     public class CounselorAdminController : Controller
     {
         private readonly SqlServerDbContext _context;
+        private readonly ILogger<CounselorAdminController> _logger; // Add logger
 
-        public CounselorAdminController(SqlServerDbContext context)
+        public CounselorAdminController(SqlServerDbContext context, ILogger<CounselorAdminController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: /CounselorAdmin
@@ -27,18 +30,17 @@ namespace BWC.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it accordingly
-                // Example: _logger.LogError(ex, "An error occurred while fetching counselors.");
-                return View("Error"); // Return an error view if needed
+                _logger.LogError(ex, "An error occurred while fetching counselors.");
+                return StatusCode(500, "Internal server error. Please try again later.");
             }
         }
 
+        // GET: /CounselorAdmin/Create
         public IActionResult Create()
         {
             var model = new User();
             return View(model);
         }
-
 
         // POST: /CounselorAdmin/Create
         [HttpPost]
@@ -58,12 +60,10 @@ namespace BWC.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it accordingly
-                // Example: _logger.LogError(ex, "An error occurred while creating a counselor.");
-                return View("Error"); // Return an error view if needed
+                _logger.LogError(ex, "An error occurred while creating a counselor.");
+                return StatusCode(500, "Internal server error. Please try again later.");
             }
         }
-
 
         // GET: /CounselorAdmin/Edit/5
         public async Task<IActionResult> Edit(int id)
@@ -79,9 +79,8 @@ namespace BWC.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it accordingly
-                // Example: _logger.LogError(ex, "An error occurred while fetching the counselor.");
-                return View("Error"); // Return an error view if needed
+                _logger.LogError(ex, "An error occurred while fetching the counselor.");
+                return StatusCode(500, "Internal server error. Please try again later.");
             }
         }
 
@@ -113,14 +112,14 @@ namespace BWC.Controllers
                 }
                 else
                 {
-                    throw;
+                    _logger.LogError("Concurrency error while updating the counselor.");
+                    return StatusCode(500, "Internal server error. Please try again later.");
                 }
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it accordingly
-                // Example: _logger.LogError(ex, "An error occurred while updating the counselor.");
-                return View("Error"); // Return an error view if needed
+                _logger.LogError(ex, "An error occurred while updating the counselor.");
+                return StatusCode(500, "Internal server error. Please try again later.");
             }
         }
 
@@ -139,9 +138,8 @@ namespace BWC.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it accordingly
-                // Example: _logger.LogError(ex, "An error occurred while fetching the counselor for deletion.");
-                return View("Error"); // Return an error view if needed
+                _logger.LogError(ex, "An error occurred while fetching the counselor for deletion.");
+                return StatusCode(500, "Internal server error. Please try again later.");
             }
         }
 
@@ -162,9 +160,8 @@ namespace BWC.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it accordingly
-                // Example: _logger.LogError(ex, "An error occurred while deleting the counselor.");
-                return View("Error"); // Return an error view if needed
+                _logger.LogError(ex, "An error occurred while deleting the counselor.");
+                return StatusCode(500, "Internal server error. Please try again later.");
             }
         }
 

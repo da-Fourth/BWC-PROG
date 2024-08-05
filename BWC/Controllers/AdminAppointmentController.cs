@@ -18,63 +18,90 @@ namespace BWC.Controllers
         // GET: AdminAppointment
         public IActionResult Index()
         {
-            var appointments = _context.Appointments
-                .Include(a => a.Counselor)
-                .Include(a => a.Student)
-                .ToList();
-
-            if (appointments == null || !appointments.Any())
+            try
             {
-                appointments = new List<Appointment>();
-            }
+                var appointments = _context.Appointments
+                    .Include(a => a.Counselor)
+                    .Include(a => a.Student)
+                    .ToList();
 
-            return View(appointments);
+                if (appointments == null || !appointments.Any())
+                {
+                    appointments = new List<Appointment>();
+                }
+
+                return View(appointments);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                // _logger.LogError(ex, "An error occurred while fetching appointments.");
+                return StatusCode(500, "Internal server error. Please try again later.");
+            }
         }
 
         // GET: AdminAppointment/Details/5
         public IActionResult Details(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
+                if (id == null)
+                {
+                    return NotFound();
+                }
+
+                var appointment = _context.Appointments
+                    .Include(a => a.Counselor)
+                    .Include(a => a.Student)
+                    .FirstOrDefault(m => m.Appointment_Id == id);
+
+                if (appointment == null)
+                {
+                    return NotFound();
+                }
+
+                return View(appointment);
             }
-
-            var appointment = _context.Appointments
-                .Include(a => a.Counselor)
-                .Include(a => a.Student)
-                .FirstOrDefault(m => m.Appointment_Id == id);
-
-            if (appointment == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                // Log the exception
+                // _logger.LogError(ex, "An error occurred while fetching appointment details.");
+                return StatusCode(500, "Internal server error. Please try again later.");
             }
-
-            return View(appointment);
         }
 
         // GET: AdminAppointment/Create
         public IActionResult Create()
         {
-            var counselors = _context.Users
-                .Where(u => u.Role == 1)
-                .Select(u => new SelectListItem
-                {
-                    Value = u.Id.ToString(),
-                    Text = u.FirstName + " " + u.LastName
-                }).ToList();
+            try
+            {
+                var counselors = _context.Users
+                    .Where(u => u.Role == 1)
+                    .Select(u => new SelectListItem
+                    {
+                        Value = u.Id.ToString(),
+                        Text = u.FirstName + " " + u.LastName
+                    }).ToList();
 
-            var students = _context.Users
-                .Where(u => u.Role == 0)
-                .Select(u => new SelectListItem
-                {
-                    Value = u.Id.ToString(),
-                    Text = u.FirstName + " " + u.LastName
-                }).ToList();
+                var students = _context.Users
+                    .Where(u => u.Role == 0)
+                    .Select(u => new SelectListItem
+                    {
+                        Value = u.Id.ToString(),
+                        Text = u.FirstName + " " + u.LastName
+                    }).ToList();
 
-            ViewBag.Counselors = counselors;
-            ViewBag.Students = students;
+                ViewBag.Counselors = counselors;
+                ViewBag.Students = students;
 
-            return View(new AppointmentDto());
+                return View(new AppointmentDto());
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                // _logger.LogError(ex, "An error occurred while preparing the create appointment view.");
+                return StatusCode(500, "Internal server error. Please try again later.");
+            }
         }
 
         // POST: AdminAppointment/Create
@@ -82,182 +109,213 @@ namespace BWC.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create([Bind("CounselorId,StudentId,AppointmentDate,Reason,Status,AppointmentType")] AppointmentDto appointmentDto)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var appointment = new Appointment
+                if (ModelState.IsValid)
                 {
-                    CounselorId = appointmentDto.CounselorId,
-                    StudentId = appointmentDto.StudentId,
-                    AppointmentDate = appointmentDto.AppointmentDate,
-                    Reason = appointmentDto.Reason,
-                    Status = appointmentDto.Status,
-                    AppointmentType = appointmentDto.AppointmentType
-                };
+                    var appointment = new Appointment
+                    {
+                        CounselorId = appointmentDto.CounselorId,
+                        StudentId = appointmentDto.StudentId,
+                        AppointmentDate = appointmentDto.AppointmentDate,
+                        Reason = appointmentDto.Reason,
+                        Status = appointmentDto.Status,
+                        AppointmentType = appointmentDto.AppointmentType
+                    };
 
-                _context.Add(appointment);
-                _context.SaveChanges();
-                return RedirectToAction(nameof(Index));
+                    _context.Add(appointment);
+                    _context.SaveChanges();
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var counselors = _context.Users
+                    .Where(u => u.Role == 1)
+                    .Select(u => new SelectListItem
+                    {
+                        Value = u.Id.ToString(),
+                        Text = u.FirstName + " " + u.LastName
+                    }).ToList();
+
+                var students = _context.Users
+                    .Where(u => u.Role == 0)
+                    .Select(u => new SelectListItem
+                    {
+                        Value = u.Id.ToString(),
+                        Text = u.FirstName + " " + u.LastName
+                    }).ToList();
+
+                ViewBag.Counselors = counselors;
+                ViewBag.Students = students;
+
+                return View(appointmentDto);
             }
-
-            var counselors = _context.Users
-                .Where(u => u.Role == 1)
-                .Select(u => new SelectListItem
-                {
-                    Value = u.Id.ToString(),
-                    Text = u.FirstName + " " + u.LastName
-                }).ToList();
-
-            var students = _context.Users
-                .Where(u => u.Role == 0)
-                .Select(u => new SelectListItem
-                {
-                    Value = u.Id.ToString(),
-                    Text = u.FirstName + " " + u.LastName
-                }).ToList();
-
-            ViewBag.Counselors = counselors;
-            ViewBag.Students = students;
-
-            return View(appointmentDto);
+            catch (Exception ex)
+            {
+                // Log the exception
+                // _logger.LogError(ex, "An error occurred while creating the appointment.");
+                return StatusCode(500, "Internal server error. Please try again later.");
+            }
         }
-
-
-
 
         // GET: AdminAppointment/Edit/5
         public IActionResult Edit(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
-
-            var appointment = _context.Appointments.Find(id);
-            if (appointment == null)
-            {
-                return NotFound();
-            }
-
-            var appointmentDto = new AppointmentDto
-            {
-                CounselorId = appointment.CounselorId ?? 0, // Provide a default value
-                StudentId = appointment.StudentId ?? 0, // Provide a default value
-                AppointmentDate = appointment.AppointmentDate,
-                Reason = appointment.Reason,
-                Status = appointment.Status ?? 0, // Provide a default value
-                AppointmentType = appointment.AppointmentType ?? 0 // Provide a default value
-            };
-
-            var counselors = _context.Users
-                .Where(u => u.Role == 1)
-                .Select(u => new SelectListItem
+                if (id == null)
                 {
-                    Value = u.Id.ToString(),
-                    Text = u.FirstName + " " + u.LastName
-                }).ToList();
+                    return NotFound();
+                }
 
-            var students = _context.Users
-                .Where(u => u.Role == 0)
-                .Select(u => new SelectListItem
-                {
-                    Value = u.Id.ToString(),
-                    Text = u.FirstName + " " + u.LastName
-                }).ToList();
-
-            ViewBag.Counselors = counselors;
-            ViewBag.Students = students;
-
-            return View(appointmentDto);
-        }
-
-
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, [Bind("CounselorId,StudentId,AppointmentDate,Reason,Status,AppointmentType")] AppointmentDto appointmentDto)
-        {
-            if (id == 0)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
                 var appointment = _context.Appointments.Find(id);
                 if (appointment == null)
                 {
                     return NotFound();
                 }
 
-                appointment.CounselorId = appointmentDto.CounselorId;
-                appointment.StudentId = appointmentDto.StudentId;
-                appointment.AppointmentDate = appointmentDto.AppointmentDate;
-                appointment.Reason = appointmentDto.Reason;
-                appointment.Status = appointmentDto.Status;
-                appointment.AppointmentType = appointmentDto.AppointmentType;
+                var appointmentDto = new AppointmentDto
+                {
+                    CounselorId = appointment.CounselorId ?? 0,
+                    StudentId = appointment.StudentId ?? 0,
+                    AppointmentDate = appointment.AppointmentDate,
+                    Reason = appointment.Reason,
+                    Status = appointment.Status ?? 0,
+                    AppointmentType = appointment.AppointmentType ?? 0
+                };
 
-                try
+                var counselors = _context.Users
+                    .Where(u => u.Role == 1)
+                    .Select(u => new SelectListItem
+                    {
+                        Value = u.Id.ToString(),
+                        Text = u.FirstName + " " + u.LastName
+                    }).ToList();
+
+                var students = _context.Users
+                    .Where(u => u.Role == 0)
+                    .Select(u => new SelectListItem
+                    {
+                        Value = u.Id.ToString(),
+                        Text = u.FirstName + " " + u.LastName
+                    }).ToList();
+
+                ViewBag.Counselors = counselors;
+                ViewBag.Students = students;
+
+                return View(appointmentDto);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                // _logger.LogError(ex, "An error occurred while preparing the edit appointment view.");
+                return StatusCode(500, "Internal server error. Please try again later.");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, [Bind("CounselorId,StudentId,AppointmentDate,Reason,Status,AppointmentType")] AppointmentDto appointmentDto)
+        {
+            try
+            {
+                if (id == 0)
                 {
-                    _context.Update(appointment);
-                    _context.SaveChanges();
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
+
+                if (ModelState.IsValid)
                 {
-                    if (!AppointmentExists(appointment.Appointment_Id))
+                    var appointment = _context.Appointments.Find(id);
+                    if (appointment == null)
                     {
                         return NotFound();
                     }
-                    else
+
+                    appointment.CounselorId = appointmentDto.CounselorId;
+                    appointment.StudentId = appointmentDto.StudentId;
+                    appointment.AppointmentDate = appointmentDto.AppointmentDate;
+                    appointment.Reason = appointmentDto.Reason;
+                    appointment.Status = appointmentDto.Status;
+                    appointment.AppointmentType = appointmentDto.AppointmentType;
+
+                    try
                     {
-                        throw;
+                        _context.Update(appointment);
+                        _context.SaveChanges();
                     }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!AppointmentExists(appointment.Appointment_Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            // Log the exception
+                            // _logger.LogError(ex, "An error occurred while updating the appointment.");
+                            return StatusCode(500, "Internal server error. Please try again later.");
+                        }
+                    }
+                    return RedirectToAction(nameof(Index));
                 }
-                return RedirectToAction(nameof(Index));
+
+                var counselors = _context.Users
+                    .Where(u => u.Role == 1)
+                    .Select(u => new SelectListItem
+                    {
+                        Value = u.Id.ToString(),
+                        Text = u.FirstName + " " + u.LastName
+                    }).ToList();
+
+                var students = _context.Users
+                    .Where(u => u.Role == 0)
+                    .Select(u => new SelectListItem
+                    {
+                        Value = u.Id.ToString(),
+                        Text = u.FirstName + " " + u.LastName
+                    }).ToList();
+
+                ViewBag.Counselors = counselors;
+                ViewBag.Students = students;
+
+                return View(appointmentDto);
             }
-
-            var counselors = _context.Users
-                .Where(u => u.Role == 1)
-                .Select(u => new SelectListItem
-                {
-                    Value = u.Id.ToString(),
-                    Text = u.FirstName + " " + u.LastName
-                }).ToList();
-
-            var students = _context.Users
-                .Where(u => u.Role == 0)
-                .Select(u => new SelectListItem
-                {
-                    Value = u.Id.ToString(),
-                    Text = u.FirstName + " " + u.LastName
-                }).ToList();
-
-            ViewBag.Counselors = counselors;
-            ViewBag.Students = students;
-
-            return View(appointmentDto);
+            catch (Exception ex)
+            {
+                // Log the exception
+                // _logger.LogError(ex, "An error occurred while editing the appointment.");
+                return StatusCode(500, "Internal server error. Please try again later.");
+            }
         }
-
-
 
         // GET: AdminAppointment/Delete/5
         public IActionResult Delete(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
+                if (id == null)
+                {
+                    return NotFound();
+                }
+
+                var appointment = _context.Appointments
+                    .Include(a => a.Counselor)
+                    .Include(a => a.Student)
+                    .FirstOrDefault(m => m.Appointment_Id == id);
+
+                if (appointment == null)
+                {
+                    return NotFound();
+                }
+
+                return View(appointment);
             }
-
-            var appointment = _context.Appointments
-                .Include(a => a.Counselor)
-                .Include(a => a.Student)
-                .FirstOrDefault(m => m.Appointment_Id == id);
-
-            if (appointment == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                // Log the exception
+                // _logger.LogError(ex, "An error occurred while fetching the appointment for deletion.");
+                return StatusCode(500, "Internal server error. Please try again later.");
             }
-
-            return View(appointment);
         }
 
         // POST: AdminAppointment/Delete/5
@@ -265,17 +323,25 @@ namespace BWC.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            var appointment = _context.Appointments.Find(id);
-            if (appointment == null)
+            try
             {
-                return NotFound();
+                var appointment = _context.Appointments.Find(id);
+                if (appointment == null)
+                {
+                    return NotFound();
+                }
+
+                _context.Appointments.Remove(appointment);
+                _context.SaveChanges();
+                return RedirectToAction(nameof(Index));
             }
-
-            _context.Appointments.Remove(appointment);
-            _context.SaveChanges();
-            return RedirectToAction(nameof(Index));
+            catch (Exception ex)
+            {
+                // Log the exception
+                // _logger.LogError(ex, "An error occurred while deleting the appointment.");
+                return StatusCode(500, "Internal server error. Please try again later.");
+            }
         }
-
 
         private bool AppointmentExists(int id)
         {

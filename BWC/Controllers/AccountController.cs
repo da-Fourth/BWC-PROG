@@ -15,32 +15,56 @@ namespace BWC.Controllers
 
         public IActionResult Register()
         {
-            return View("Register/Index");
+            try
+            {
+                return View("Register/Index");
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> Register(User model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                // Hash the password before saving (use a proper hashing method in production)
-                model.PasswordHash = HashPassword(model.PasswordHash);
+                if (ModelState.IsValid)
+                {
+                    // Hash the password before saving (use a proper hashing method in production)
+                    model.PasswordHash = HashPassword(model.PasswordHash);
 
-                _context.Users.Add(model);
-                await _context.SaveChangesAsync();
+                    _context.Users.Add(model);
+                    await _context.SaveChangesAsync();
 
-                // Registration successful, redirect to a secure page
-                return RedirectToAction("Index", "Home");
+                    // Registration successful, redirect to a secure page
+                    return RedirectToAction("Index", "Home");
+                }
+
+                // If we got this far, something failed, redisplay form
+                return View(model);
             }
-
-            // If we got this far, something failed, redisplay form
-            return View(model);
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         private string HashPassword(string password)
         {
-            // Implement a proper password hashing method here
-            return password; // Placeholder, replace with actual hashing
+            try
+            {
+                // Implement a proper password hashing method here
+                return password; // Placeholder, replace with actual hashing
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                throw new Exception("Error hashing password", ex);
+            }
         }
     }
 }

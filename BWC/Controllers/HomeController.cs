@@ -20,18 +20,26 @@ namespace BWC.Controllers
 
         public IActionResult Index()
         {
-            var totalAppointments = _context.Appointments.Count();
-            var followUps = _context.Appointments.Count(a => a.AppointmentType == 1); // Follow-Up
-            var completed = _context.Appointments.Count(a => a.Status == 4); // Complete
-
-            var model = new AppointmentStatisticsViewModel
+            try
             {
-                TotalAppointments = totalAppointments,
-                FollowUps = followUps,
-                Completed = completed
-            };
+                var totalAppointments = _context.Appointments.Count();
+                var followUps = _context.Appointments.Count(a => a.AppointmentType == 1); // Follow-Up
+                var completed = _context.Appointments.Count(a => a.Status == 4); // Complete
 
-            return View(model);
+                var model = new AppointmentStatisticsViewModel
+                {
+                    TotalAppointments = totalAppointments,
+                    FollowUps = followUps,
+                    Completed = completed
+                };
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving appointment statistics.");
+                return StatusCode(500, "Internal server error. Please try again later.");
+            }
         }
 
         public IActionResult Privacy()

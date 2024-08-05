@@ -1,16 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BWC.DataConnection;
 using BWC.Models;
+using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
+using BCrypt.Net;
 
 namespace BWC.Controllers
 {
     public class RegisterController : Controller
     {
-        public readonly SqlServerDbContext _context;
+        private readonly SqlServerDbContext _context;
+        private readonly ILogger<RegisterController> _logger;
 
-        public RegisterController(SqlServerDbContext context)
+        public RegisterController(SqlServerDbContext context, ILogger<RegisterController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public IActionResult Index()
@@ -18,20 +23,27 @@ namespace BWC.Controllers
             return View();
         }
 
-
         [HttpPost]
         public async Task<IActionResult> Register(User model)
         {
             if (ModelState.IsValid)
             {
-                // Hash the password before saving (use a proper hashing method in production)
-                model.PasswordHash = HashPassword(model.PasswordHash);
+                try
+                {
+                    // Hash the password before saving
+                    model.PasswordHash = HashPassword(model.PasswordHash);
 
-                _context.Users.Add(model);
-                await _context.SaveChangesAsync();
+                    _context.Users.Add(model);
+                    await _context.SaveChangesAsync();
 
-                // Registration successful, redirect to a secure page
-                return RedirectToAction("Index", "Home");
+                    // Registration successful, redirect to a secure page
+                    return RedirectToAction("Index", "Home");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "An error occurred during registration.");
+                    ModelState.AddModelError("", "An error occurred while processing your request.");
+                }
             }
 
             // If we got this far, something failed, redisplay form
@@ -40,10 +52,8 @@ namespace BWC.Controllers
 
         private string HashPassword(string password)
         {
-            // Implement a proper password hashing method here
-            return password; // Placeholder, replace with actual hashing
+            // Use BCrypt for password hashing
+            return BCrypt.Net.BCrypt.HashPassword(password);
         }
-
-
     }
 }

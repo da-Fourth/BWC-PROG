@@ -22,74 +22,92 @@ namespace BWC.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var userId = _userService.UserId;
-            if (string.IsNullOrEmpty(userId))
+            try
             {
-                // User is not logged in, redirect to login page
-                return RedirectToAction("Index", "Login");
-            }
+                var userId = _userService.UserId;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    // User is not logged in, redirect to login page
+                    return RedirectToAction("Index", "Login");
+                }
 
-            if (!int.TryParse(userId, out int userIdInt))
+                if (!int.TryParse(userId, out int userIdInt))
+                {
+                    // Handle the case where the userId is not a valid integer
+                    return RedirectToAction("Index");
+                }
+
+                var appointments = await _context.Appointments
+                    .Where(a => a.StudentId == userIdInt)
+                    .Include(a => a.Student) // Ensure related Student data is loaded
+                    .Include(a => a.Counselor) // Ensure related Counselor data is loaded, even if null
+                    .ToListAsync();
+
+                return View(appointments);
+            }
+            catch (Exception ex)
             {
-                // Handle the case where the userId is not a valid integer
-                return RedirectToAction("Index");
+                // Log the exception (optional)
+                // _logger.LogError(ex, "An error occurred while fetching the appointments.");
+                return StatusCode(500, "Internal server error");
             }
-
-            var appointments = await _context.Appointments
-                .Where(a => a.StudentId == userIdInt)
-                .Include(a => a.Student) // Ensure related Student data is loaded
-                .Include(a => a.Counselor) // Ensure related Counselor data is loaded, even if null
-                .ToListAsync();
-
-            return View(appointments);
         }
 
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var userId = _userService.UserId;
-            if (string.IsNullOrEmpty(userId))
+            try
             {
-                // User is not logged in, redirect to login page
-                return RedirectToAction("Index", "Login");
-            }
-
-            if (!int.TryParse(userId, out int userIdInt))
-            {
-                // Handle the case where the userId is not a valid integer
-                return RedirectToAction("Index");
-            }
-
-            var student = await _context.Users
-                .Where(s => s.Id == userIdInt && s.Role == 0)
-                .FirstOrDefaultAsync();
-
-            if (student == null)
-            {
-                // Handle the case where the student is not found
-                return RedirectToAction("Index");
-            }
-
-            ViewBag.StudentName = $"{student.FirstName} {student.LastName}";
-
-            var counselors = await _context.Users
-                .Where(u => u.Role == 1) // Assuming Role 1 is for Counselors
-                .Select(c => new SelectListItem
+                var userId = _userService.UserId;
+                if (string.IsNullOrEmpty(userId))
                 {
-                    Value = c.Id.ToString(),
-                    Text = $"{c.FirstName} {c.LastName}"
-                })
-                .ToListAsync();
+                    // User is not logged in, redirect to login page
+                    return RedirectToAction("Index", "Login");
+                }
 
-            ViewBag.Counselors = new SelectList(counselors, "Value", "Text");
+                if (!int.TryParse(userId, out int userIdInt))
+                {
+                    // Handle the case where the userId is not a valid integer
+                    return RedirectToAction("Index");
+                }
 
-            var model = new AppointmentDto
+                var student = await _context.Users
+                    .Where(s => s.Id == userIdInt && s.Role == 0)
+                    .FirstOrDefaultAsync();
+
+                if (student == null)
+                {
+                    // Handle the case where the student is not found
+                    return RedirectToAction("Index");
+                }
+
+                ViewBag.StudentName = $"{student.FirstName} {student.LastName}";
+
+                var counselors = await _context.Users
+                    .Where(u => u.Role == 1) // Assuming Role 1 is for Counselors
+                    .Select(c => new SelectListItem
+                    {
+                        Value = c.Id.ToString(),
+                        Text = $"{c.FirstName} {c.LastName}"
+                    })
+                    .ToListAsync();
+
+                ViewBag.Counselors = new SelectList(counselors, "Value", "Text");
+
+                var model = new AppointmentDto
+                {
+                    StudentId = userIdInt,
+                    Status = 0 // Default to Pending
+                };
+
+                return View(model);
+            }
+            catch (Exception ex)
             {
-                StudentId = userIdInt,
-                Status = 0 // Default to Pending
-            };
-
-            return View(model);
+                // Log the exception (optional)
+                // _logger.LogError(ex, "An error occurred while preparing the create appointment form.");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         [HttpPost]
@@ -98,20 +116,29 @@ namespace BWC.Controllers
         {
             if (ModelState.IsValid)
             {
-                var appointment = new Appointment
+                try
                 {
-                    StudentId = model.StudentId,
-                    AppointmentDate = model.AppointmentDate,
-                    Reason = model.Reason,
-                    Status = model.Status,
-                    AppointmentType = model.AppointmentType,
-                    CounselorId = model.CounselorId
-                };
+                    var appointment = new Appointment
+                    {
+                        StudentId = model.StudentId,
+                        AppointmentDate = model.AppointmentDate,
+                        Reason = model.Reason,
+                        Status = model.Status,
+                        AppointmentType = model.AppointmentType,
+                        CounselorId = model.CounselorId
+                    };
 
-                _context.Appointments.Add(appointment);
-                await _context.SaveChangesAsync();
+                    _context.Appointments.Add(appointment);
+                    await _context.SaveChangesAsync();
 
-                return RedirectToAction("Index");
+                    return RedirectToAction("Index");
+                }
+                catch (Exception ex)
+                {
+                    // Log the exception (optional)
+                    // _logger.LogError(ex, "An error occurred while creating the appointment.");
+                    ModelState.AddModelError(string.Empty, "An error occurred while creating the appointment.");
+                }
             }
 
             // Repopulate the ViewBag.StudentName and ViewBag.Counselors in case of an error
@@ -141,45 +168,53 @@ namespace BWC.Controllers
                 return NotFound();
             }
 
-            var appointment = _context.Appointments.Find(id);
-            if (appointment == null)
+            try
             {
-                return NotFound();
+                var appointment = _context.Appointments.Find(id);
+                if (appointment == null)
+                {
+                    return NotFound();
+                }
+
+                var appointmentDto = new AppointmentDto
+                {
+                    CounselorId = Convert.ToInt16(appointment.CounselorId),
+                    StudentId = Convert.ToInt16(appointment.StudentId),
+                    AppointmentDate = appointment.AppointmentDate,
+                    Reason = appointment.Reason,
+                    Status = Convert.ToInt16(appointment.Status),
+                    AppointmentType = Convert.ToInt16(appointment.AppointmentType)
+                };
+
+                var counselors = _context.Users
+                    .Where(u => u.Role == 1)
+                    .Select(u => new SelectListItem
+                    {
+                        Value = u.Id.ToString(),
+                        Text = u.FirstName + " " + u.LastName
+                    }).ToList();
+
+                var students = _context.Users
+                    .Where(u => u.Role == 0)
+                    .Select(u => new SelectListItem
+                    {
+                        Value = u.Id.ToString(),
+                        Text = u.FirstName + " " + u.LastName
+                    }).ToList();
+
+                ViewBag.Counselors = counselors;
+                ViewBag.Students = students;
+                ViewBag.AppointmentId = appointment.Appointment_Id; // Pass the appointment_id to the view
+
+                return View(appointmentDto);
             }
-
-            var appointmentDto = new AppointmentDto
+            catch (Exception ex)
             {
-                CounselorId = Convert.ToInt16(appointment.CounselorId),
-                StudentId = Convert.ToInt16(appointment.StudentId),
-                AppointmentDate = appointment.AppointmentDate,
-                Reason = appointment.Reason,
-                Status = Convert.ToInt16(appointment.Status),
-                AppointmentType = Convert.ToInt16(appointment.AppointmentType)
-            };
-
-            var counselors = _context.Users
-                .Where(u => u.Role == 1)
-                .Select(u => new SelectListItem
-                {
-                    Value = u.Id.ToString(),
-                    Text = u.FirstName + " " + u.LastName
-                }).ToList();
-
-            var students = _context.Users
-                .Where(u => u.Role == 0)
-                .Select(u => new SelectListItem
-                {
-                    Value = u.Id.ToString(),
-                    Text = u.FirstName + " " + u.LastName
-                }).ToList();
-
-            ViewBag.Counselors = counselors;
-            ViewBag.Students = students;
-            ViewBag.AppointmentId = appointment.Appointment_Id; // Pass the appointment_id to the view
-
-            return View(appointmentDto);
+                // Log the exception (optional)
+                // _logger.LogError(ex, "An error occurred while fetching the appointment for editing.");
+                return StatusCode(500, "Internal server error");
+            }
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -192,27 +227,29 @@ namespace BWC.Controllers
 
             if (ModelState.IsValid)
             {
-                var appointment = _context.Appointments.Find(id);
-                if (appointment == null)
-                {
-                    return NotFound();
-                }
-
-                appointment.CounselorId = appointmentDto.CounselorId;
-                appointment.StudentId = appointmentDto.StudentId;
-                appointment.AppointmentDate = appointmentDto.AppointmentDate;
-                appointment.Reason = appointmentDto.Reason;
-                appointment.Status = appointmentDto.Status;
-                appointment.AppointmentType = appointmentDto.AppointmentType;
-
                 try
                 {
+                    var appointment = _context.Appointments.Find(id);
+                    if (appointment == null)
+                    {
+                        return NotFound();
+                    }
+
+                    appointment.CounselorId = appointmentDto.CounselorId;
+                    appointment.StudentId = appointmentDto.StudentId;
+                    appointment.AppointmentDate = appointmentDto.AppointmentDate;
+                    appointment.Reason = appointmentDto.Reason;
+                    appointment.Status = appointmentDto.Status;
+                    appointment.AppointmentType = appointmentDto.AppointmentType;
+
                     _context.Update(appointment);
                     _context.SaveChanges();
+
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AppointmentExists(appointment.Appointment_Id))
+                    if (!AppointmentExists(id))
                     {
                         return NotFound();
                     }
@@ -221,7 +258,12 @@ namespace BWC.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                catch (Exception ex)
+                {
+                    // Log the exception (optional)
+                    // _logger.LogError(ex, "An error occurred while updating the appointment.");
+                    ModelState.AddModelError(string.Empty, "An error occurred while updating the appointment.");
+                }
             }
 
             var counselors = _context.Users
@@ -246,21 +288,29 @@ namespace BWC.Controllers
             return View(appointmentDto);
         }
 
-      
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int appointment_id)
         {
-            var appointment = await _context.Appointments.FindAsync(appointment_id);
-            if (appointment == null)
+            try
             {
-                return NotFound();
+                var appointment = await _context.Appointments.FindAsync(appointment_id);
+                if (appointment == null)
+                {
+                    return NotFound();
+                }
+
+                _context.Appointments.Remove(appointment);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Index));
             }
-
-            _context.Appointments.Remove(appointment);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(Index));
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                // _logger.LogError(ex, "An error occurred while deleting the appointment.");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         private bool AppointmentExists(int id)
