@@ -36,7 +36,8 @@ namespace BWC.Controllers
         // GET: /StudentAdmin/Create
         public IActionResult Create()
         {
-            return View();
+            var model = new User();
+            return View(model);
         }
 
         // POST: /StudentAdmin/Create

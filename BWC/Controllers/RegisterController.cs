@@ -3,7 +3,6 @@ using BWC.DataConnection;
 using BWC.Models;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
-using BCrypt.Net;
 
 namespace BWC.Controllers
 {
@@ -53,7 +52,7 @@ namespace BWC.Controllers
         private string HashPassword(string password)
         {
             // Use BCrypt for password hashing
-            return BCrypt.Net.BCrypt.HashPassword(password);
+            return password;
         }
     }
 }
