@@ -44,15 +44,14 @@
 </style>
 
 <body>
-   
     <section class="dashboard">
-       
         <div class="main-content">
             <div class="form-container">
                 <h2>Edit Counselor</h2>
                 <form asp-action="Edit" method="post">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="Id" value="@Model.Id" />
+                    <input type="hidden" name="Role" value="@Model.Role" /> <!-- Hidden Role Field -->
 
                     <div class="form-group">
                         <label for="FirstName">First Name</label>

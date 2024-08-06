@@ -160,6 +160,11 @@ namespace BWC.Controllers
                 var user = await _context.Users.FindAsync(id);
                 if (user != null && user.Role == 0)
                 {
+                    // Delete related appointments first
+                    var appointments = _context.Appointments.Where(a => a.StudentId == id);
+                    _context.Appointments.RemoveRange(appointments);
+
+                    // Delete the student
                     _context.Users.Remove(user);
                     await _context.SaveChangesAsync();
                 }
@@ -172,6 +177,7 @@ namespace BWC.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
+
 
         private bool UserExists(int id)
         {

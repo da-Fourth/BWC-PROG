@@ -87,7 +87,7 @@ namespace BWC.Controllers
         // POST: /CounselorAdmin/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,MiddleName,LastName,Email,Username,PasswordHash,Program")] User user)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,MiddleName,LastName,Email,Username,PasswordHash,Program,Role")] User user)
         {
             if (id != user.Id || user.Role != 1)
             {
@@ -123,7 +123,6 @@ namespace BWC.Controllers
             }
         }
 
-        // GET: /CounselorAdmin/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
             try
@@ -143,27 +142,37 @@ namespace BWC.Controllers
             }
         }
 
-        // POST: /CounselorAdmin/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+
+        [HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> DeleteConfirmed(int id)
+{
+    try
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user != null && user.Role == 1)
         {
-            try
-            {
-                var user = await _context.Users.FindAsync(id);
-                if (user != null && user.Role == 1)
-                {
-                    _context.Users.Remove(user);
-                    await _context.SaveChangesAsync();
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while deleting the counselor.");
-                return StatusCode(500, "Internal server error. Please try again later.");
-            }
+            // Delete related appointments first
+            var appointments = _context.Appointments.Where(a => a.CounselorId == id);
+            _context.Appointments.RemoveRange(appointments);
+
+            // Delete the counselor
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
         }
+        return RedirectToAction(nameof(Index));
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "An error occurred while deleting the counselor.");
+        return StatusCode(500, "Internal server error. Please try again later.");
+    }
+}
+
+
+
+
+
 
         private bool UserExists(int id)
         {
