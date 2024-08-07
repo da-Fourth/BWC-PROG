@@ -3,9 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using BWC.DataConnection; // Update with the actual namespace for your DbContext
 using BWC.Models;
 using Microsoft.Extensions.Logging; // Add using directive for logging
+using Microsoft.AspNetCore.Authorization;
 
 namespace BWC.Controllers
 {
+
+    [Authorize(Policy = "AdminPolicy")]
     public class CounselorAdminController : Controller
     {
         private readonly SqlServerDbContext _context;

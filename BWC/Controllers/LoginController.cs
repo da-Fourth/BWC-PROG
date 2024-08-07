@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using BWC.Models;
 using System.Threading.Tasks;
 using BWC.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
 
 namespace BWC.Controllers
 {
@@ -18,12 +21,19 @@ namespace BWC.Controllers
             _userService = userService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            // Sign out the user
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Clear user information from the user service
+            _userService.UserId = null;
+            _userService.Username = null;
+
             return View();
         }
 
-     
+
         [HttpPost]
         public async Task<IActionResult> Login(LoginDto model)
         {
@@ -41,6 +51,22 @@ namespace BWC.Controllers
                             // Save user information in the user service
                             _userService.UserId = user.Id.ToString();
                             _userService.Username = user.Username;
+
+                            // Create claims
+                            var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, user.Username),
+                        new Claim("Role", user.Role.ToString())
+                    };
+
+                            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                            var authProperties = new AuthenticationProperties
+                            {
+                                IsPersistent = true
+                            };
+
+                            // Sign in the user
+                            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
 
                             // Redirect based on user role
                             switch (user.Role)
@@ -81,6 +107,7 @@ namespace BWC.Controllers
             // If we got this far, something failed, redisplay form
             return View("Index", model);
         }
+
 
     }
 }

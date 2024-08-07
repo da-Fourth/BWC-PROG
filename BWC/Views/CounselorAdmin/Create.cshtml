@@ -43,13 +43,7 @@
 </style>
 
 <body>
-    <nav class="sidebar">
-        <!-- Sidebar content -->
-    </nav>
     <section class="dashboard">
-        <div class="top">
-            <i class="uil uil-bars sidebar-toggle"></i>
-        </div>
         <div class="main-content">
             <div class="form-container">
                 <h2>Create Counselor</h2>
@@ -63,7 +57,7 @@
 
                     <div class="form-group">
                         <label for="MiddleName">Middle Name</label>
-                        <input type="text" id="MiddleName" name="MiddleName" value="@Model.MiddleName" />
+                        <input type="text" id="MiddleName" name="MiddleName" value="@Model.MiddleName" required />
                     </div>
 
                     <div class="form-group">
@@ -88,7 +82,7 @@
 
                     <div class="form-group">
                         <label for="Program">Program</label>
-                        <input type="text" id="Program" name="Program" value="@Model.Program" />
+                        <input type="text" id="Program" name="Program" value="@Model.Program" required />
                     </div>
 
                     <div class="form-group">

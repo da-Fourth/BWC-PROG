@@ -2,9 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using BWC.DataConnection;
 using BWC.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BWC.Controllers
 {
+    [Authorize(Policy = "AdminPolicy")]
     public class StudentAdminController : Controller
     {
         private readonly SqlServerDbContext _context;

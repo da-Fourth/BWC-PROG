@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 using BWC.DataConnection;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging; // Add using directive for logging
+using Microsoft.AspNetCore.Authorization;
 
 namespace BWC.Controllers
 {
+    [Authorize(Policy = "CounselorPolicy")]
     public class CounselorAppointmentController : Controller
     {
         private readonly SqlServerDbContext _context;

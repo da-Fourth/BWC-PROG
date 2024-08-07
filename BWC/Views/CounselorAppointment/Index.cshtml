@@ -97,13 +97,6 @@
         </div>
     </nav>
     <section class="dashboard">
-        <div class="top">
-            <i class="uil uil-bars sidebar-toggle"></i>
-            <div class="search-box">
-                <i class="uil uil-search"></i>
-                <input type="text" placeholder="Search here...">
-            </div>
-        </div>
         <div class="main-content">
             <div class="dash-content">
                
@@ -123,7 +116,7 @@
                         if (appointment != null && appointment.Student != null)
                         {
                             <div>
-                                <strong>@appointment.Student.FirstName @appointment.Student.LastName</strong> - @appointment.AppointmentDate.ToString("MMMM dd, yyyy") - @GetStatusText(appointment.Status)
+                                <strong>@appointment.Student.FirstName @appointment.Student.LastName</strong> - @appointment.AppointmentDate.ToString("MMMM dd, yyyy") - @appointment.Student.Email - @GetStatusText(appointment.Status)
                             </div>
                         }
                     }

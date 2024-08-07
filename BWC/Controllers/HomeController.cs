@@ -4,9 +4,12 @@ using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Linq;
 using BWC.DataConnection;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BWC.Controllers
 {
+
+    [Authorize(Policy = "AdminPolicy")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

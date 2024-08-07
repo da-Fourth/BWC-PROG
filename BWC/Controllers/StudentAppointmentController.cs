@@ -6,9 +6,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using BWC.DataConnection;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BWC.Controllers
 {
+    [Authorize(Policy = "StudentPolicy")]
     public class StudentAppointmentController : Controller
     {
         private readonly SqlServerDbContext _context;

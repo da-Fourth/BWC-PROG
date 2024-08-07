@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BWC.DataConnection;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BWC.Controllers
 {
+    [Authorize(Policy = "AdminPolicy")]
     public class AdminAppointmentController : Controller
     {
         private readonly SqlServerDbContext _context;

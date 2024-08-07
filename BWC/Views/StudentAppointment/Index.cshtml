@@ -97,13 +97,6 @@
         </div>
     </nav>
     <section class="dashboard">
-        <div class="top">
-            <i class="uil uil-bars sidebar-toggle"></i>
-            <div class="search-box">
-                <i class="uil uil-search"></i>
-                <input type="text" placeholder="Search here...">
-            </div>
-        </div>
         <div class="main-content">
             <div class="dash-content">
                 <a href="@Url.Action("Create")" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background-color: #007bff; text-decoration: none; border-radius: 5px; margin-bottom: 20px;">Add Appointment</a>
@@ -124,7 +117,7 @@
                         if (appointment != null && appointment.Counselor != null)
                         {
                             <div>
-                                <strong>@appointment.Counselor.FirstName @appointment.Counselor.LastName</strong> - @appointment.AppointmentDate.ToString("MMMM dd, yyyy") - @GetStatusText(appointment.Status)
+                                <strong>@appointment.Counselor.FirstName @appointment.Counselor.LastName</strong> - @appointment.AppointmentDate.ToString("MMMM dd, yyyy") - @appointment.Counselor.Email - @GetStatusText(appointment.Status)
                             </div>
                         }
                     }
